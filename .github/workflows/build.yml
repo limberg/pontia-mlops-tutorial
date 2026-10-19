@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Staging
     steps:      
       - name: Checkout code
         uses: actions/checkout@v3
@@ -46,6 +47,12 @@ jobs:
       - name: Train and save model
         run: |
           python src/main.py
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          MLFLOW_URI: ${{ secrets.MLFLOW_URI }}
+          EXPERIMENT_NAME: ${{ secrets.EXPERIMENT_NAME }}
           
       - name: Publicar artefactos
         uses: actions/upload-artifact@v4
