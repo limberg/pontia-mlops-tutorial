@@ -51,7 +51,7 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          MLFLOW_URI: ${{ secrets.MLFLOW_URI }}
+          MLFLOW_URL: ${{ secrets.MLFLOW_URL }}
           EXPERIMENT_NAME: ${{ secrets.EXPERIMENT_NAME }}
           
       - name: Publicar artefactos
