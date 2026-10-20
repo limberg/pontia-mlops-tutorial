@@ -25,7 +25,7 @@ logger=logging.getLogger("adult-income")
 run_name = f"run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
 # MLflow config
-MLFLOW_URL =  os.getenv("MLFLOW_URL","http://localhost:5001/")
+MLFLOW_URL =  os.getenv("MLFLOW_URL","http://localhost:5000/")
 EXPERIMENT_NAME =  os.getenv("EXPERIMENT_NAME", "limbergrivera-adult-income")
 
 mlflow.set_tracking_uri(MLFLOW_URL)
