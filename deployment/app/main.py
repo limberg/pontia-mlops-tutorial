@@ -8,7 +8,7 @@ from fastapi.responses import PlainTextResponse
 import os
 from dotenv import load_dotenv, dotenv_values 
 load_dotenv() 
-#cHello dos
+# check new
 model = None
 
 @asynccontextmanager
