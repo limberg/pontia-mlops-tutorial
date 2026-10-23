@@ -1,21 +1,23 @@
 name: Integration
 
-on:
+# Ejecuta este workflow cada vez que se cree, actualice o sincronice un Pull Reuqest
+on: 
   pull_request:
 
 jobs:
   integrate:
     runs-on: ubuntu-latest
-    environment: Staging
+    environment: Staging # Usa las variables de entorno definidas en la sección "Environments" de GitHub Actions
 
     permissions:
-      contents: read
-      pull-requests: write
+      contents: read # Permite leer el codigo del repositorio
+      pull-requests: write # Permite escribir dentro del pull request -> ej: escribir comentarios con-> github.rest.issues.createComment
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+        # Instala Python versoin 3.12
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -27,7 +29,7 @@ jobs:
           pip install -r requirements.txt
         
       - name: Download Model
-        run: |
+        run: | # Descarga el modelo desde azure con ayuda de las variables de entoorno
           python scripts/download_model.py
         env:
           AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
@@ -38,7 +40,7 @@ jobs:
 
       - name: Download and extract dataset
         shell: bash
-        run: |
+        run: | # Descarga un zip desde UCI Machine Learning Repository, lo descomprime y muestra los archivos descargados
           set -euo pipefail
 
           mkdir -p ./data
@@ -56,10 +58,13 @@ jobs:
 
       - name: Run tests and save exit code
         id: tests
-        run: |
-            mkdir -p test-results
+        run: | # Ejecuta el test con pytest, crea la carpeta test-results donde se guradaran los resultados
+            mkdir -p test-results 
+            # PYTHONPATH le dice a Python busca los modulos dentro de src/ , calcula la covertura del paquete model con --cov=model
+            # genera un coverage en la consolo, genera un informe HTML, crea un informe XML estandar JUnit y gurad la salida en > test-results/results.log 
             PYTHONPATH=./src pytest tests/ --capture=tee-sys --cov=model --cov-report=term --cov-report=html --junitxml=test-results/results.xml > test-results/results.log
       
+        # Publicar comentario en el Pull Request
       - name: Comment test results and coverage on PR
         uses: actions/github-script@v7
         if: always() # auque los tests fallen, queremos comentar los resultados en el PR

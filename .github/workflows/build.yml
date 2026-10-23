@@ -3,21 +3,21 @@ name: Build Model
 on:
   push:
     branches:
-      - main
+      - main   # Para ejecutar la acción en cada push a la rama main => hacer git push origin main
 
 permissions:
-  contents: write
+  contents: write # Permiso para escribir en el repositorio, claro que tambien puede clonar y leer archivos
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: Staging
+    environment: Staging # Carga los Secrets y Variables del entorno Staging
     steps:      
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # descraga el proyecto y lopüone en ubuntu-latest
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5 # Instala python
         with:
           python-version: '3.12'
 
@@ -26,24 +26,30 @@ jobs:
           python -m pip install --upgrade pip 
           pip install -r requirements.txt     
       
+       # Descarga el dataset
       - name: Download and extract dataset
         shell: bash
         run: |
           set -euo pipefail
 
-          mkdir -p ./data/raw
+          mkdir -p ./data/raw # Crea la carpeta donde guardar los datos
 
+          # Descarga el dataset desde la UCI Machine Learning Repository
           curl -fL \
             "https://archive.ics.uci.edu/static/public/20/census+income.zip" \
             -o /tmp/census-income.zip
 
+          # Descomprime el zip 
           unzip -o /tmp/census-income.zip -d ./data/raw
 
           rm /tmp/census-income.zip
 
+          # Muestra los archivos descargados para verificar que todo salio bien.
           echo "Dataset extracted to ./data/raw"
           find ./data/raw -maxdepth 2 -type f
 
+        # Entrena el modelo en el Git HUb Runnuer (Ubunto)
+        # MLFlow (Azure) Guarda metricas, artefactos y registra la version del modelo
       - name: Train and save model
         run: |
           python src/main.py
@@ -53,7 +59,8 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           MLFLOW_URL: ${{ vars.MLFLOW_URL }}
           EXPERIMENT_NAME: ${{ vars.EXPERIMENT_NAME }}
-          
+        
+        # Publica el model.pkl como artefacto para descargarlo en build actions
       - name: Publicar artefactos
         uses: actions/upload-artifact@v4
         with:
